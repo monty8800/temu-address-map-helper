@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>收货地址地图</title>
+  <link rel="stylesheet" href="./lib/leaflet.css">
+  <link rel="stylesheet" href="./map/map.css">
+</head>
+<body>
+  <div class="mh-root">
+    <div class="mh-addrbar">
+      <div class="mh-addr" id="addrBox">正在读取地址…</div>
+      <button class="mh-copy" id="copyBtn" title="复制地址">复制</button>
+    </div>
+    <div id="map" class="mh-map"></div>
+    <div class="mh-status" id="statusBox">正在定位地址…</div>
+    <div class="mh-foot">
+      <span class="mh-hint" id="hintBox"></span>
+      <span class="mh-links">
+        <button id="countryBtn" class="mh-country" title="查看整个国家/地区">全国</button>
+        <a id="osmSearchLink" target="_blank" rel="noopener">OSM</a>
+        <a id="gmapLink" target="_blank" rel="noopener">Google 地图</a>
+        <a id="fullLink" target="_blank" rel="noopener">放大 ↗</a>
+      </span>
+    </div>
+  </div>
+  <script src="./lib/leaflet.js"></script>
+  <script src="./map/map.js"></script>
+</body>
+</html>

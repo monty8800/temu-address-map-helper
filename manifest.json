@@ -1,0 +1,46 @@
+{
+  "manifest_version": 3,
+  "name": "Temu 地址地图助手",
+  "version": "1.6.0",
+  "description": "在 Temu 订单后台的收货地址旁添加「地图」按钮，点击即弹出小地图定位该地址，辅助运营人员判断物流渠道。",
+  "host_permissions": [
+    "https://nominatim.openstreetmap.org/*",
+    "https://photon.komoot.io/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.temu.com/*"
+      ],
+      "js": [
+        "content/content.js"
+      ],
+      "css": [
+        "content/content.css"
+      ],
+      "run_at": "document_idle",
+      "all_frames": true
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "map.html",
+        "lib/leaflet.js",
+        "lib/leaflet.css",
+        "lib/images/*"
+      ],
+      "matches": [
+        "https://*.temu.com/*"
+      ]
+    }
+  ],
+  "action": {
+    "default_title": "Temu 地址地图助手"
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

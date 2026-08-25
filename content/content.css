@@ -1,0 +1,93 @@
+/* Temu 地址地图助手 - 内容脚本样式 */
+/* 按钮：紧随地址文本的小圆角按钮 */
+.tmh-map-btn {
+  display: inline-block !important;
+  margin-left: 6px !important;
+  padding: 1px 8px !important;
+  font-size: 12px !important;
+  line-height: 1.6 !important;
+  border: 1px solid #dcb100 !important;
+  background: #fff8e1 !important;
+  color: #8a6d00 !important;
+  border-radius: 12px !important;
+  cursor: pointer !important;
+  vertical-align: middle !important;
+  font-family: inherit !important;
+  font-weight: normal !important;
+  white-space: nowrap !important;
+  box-shadow: 0 1px 2px rgba(0,0,0,.08) !important;
+  transition: background .15s ease !important;
+}
+.tmh-map-btn:hover { background: #ffe082 !important; }
+.tmh-map-btn:active { background: #ffd54f !important; }
+
+/* 遮罩层 */
+.tmh-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  background: rgba(0,0,0,.35) !important;
+  z-index: 2147483647 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 16px !important;
+}
+
+/* 弹窗面板 */
+.tmh-panel {
+  background: #fff !important;
+  border-radius: 10px !important;
+  box-shadow: 0 10px 40px rgba(0,0,0,.28) !important;
+  width: 540px !important;
+  max-width: 96vw !important;
+  overflow: hidden !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif !important;
+}
+.tmh-panel-head {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 9px 12px !important;
+  background: #f7f7f7 !important;
+  border-bottom: 1px solid #e6e6e6 !important;
+  cursor: move !important;
+  user-select: none !important;
+}
+.tmh-panel-title {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: #333 !important;
+}
+.tmh-close-btn {
+  border: none !important;
+  background: transparent !important;
+  font-size: 16px !important;
+  cursor: pointer !important;
+  color: #888 !important;
+  padding: 2px 6px !important;
+  line-height: 1 !important;
+}
+.tmh-close-btn:hover { color: #000 !important; }
+
+/* 地图 iframe */
+.tmh-iframe {
+  width: 100% !important;
+  height: 440px !important;
+  border: none !important;
+  display: block !important;
+  background: #eaeaea !important;
+}
+
+/* 底部栏 */
+.tmh-panel-foot {
+  padding: 7px 12px !important;
+  background: #f7f7f7 !important;
+  border-top: 1px solid #e6e6e6 !important;
+  text-align: right !important;
+}
+.tmh-foot-link {
+  font-size: 12px !important;
+  color: #1976d2 !important;
+  text-decoration: none !important;
+}
+.tmh-foot-link:hover { text-decoration: underline !important; }
