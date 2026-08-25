@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Temu 地址地图助手",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "description": "在 Temu 订单后台的收货地址旁添加「地图」按钮，点击即弹出小地图定位该地址，辅助运营人员判断物流渠道。",
   "author": "MONTY",
   "host_permissions": [

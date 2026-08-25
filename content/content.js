@@ -1,5 +1,5 @@
 /**
- * Temu 地址地图助手 - 内容脚本 v1.2
+ * Temu 地址地图助手 - 内容脚本
  * 在 Temu 订单后台的收货地址旁注入「地图」按钮，点击弹出小地图定位地址。
  * - 运行于隔离世界，通过 iframe 加载扩展自带的地图页 map.html，避免页面 CSP 与样式冲突。
  * - 支持穿透 shadow DOM 识别地址，含定时兜底扫描（分页/异步渲染也能命中）。
@@ -89,7 +89,8 @@
     b.style.cssText = 'position:fixed;bottom:12px;right:12px;z-index:2147483646;display:flex;align-items:center;gap:8px;'
       + 'background:#1976d2;color:#fff;font:12px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;'
       + 'padding:6px 10px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.3);max-width:280px;';
-    b.innerHTML = '<span>📍 地图助手 <span style="opacity:.7">v1.2</span></span>'
+    const ver = chrome.runtime.getManifest() && chrome.runtime.getManifest().version ? chrome.runtime.getManifest().version : '';
+    b.innerHTML = '<span>📍 地图助手 <span style="opacity:.7">v' + ver + '</span></span>'
       + '<span id="tmh-badge-status" style="font-weight:600"></span>'
       + '<button id="tmh-badge-close" style="background:none;border:none;color:#fff;cursor:pointer;font-size:12px;padding:0 2px;">✕</button>';
     b.querySelector('#tmh-badge-close').addEventListener('click', () => b.remove());
