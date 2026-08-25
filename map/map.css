@@ -27,6 +27,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Ping
   padding: 6px 12px; font-size: 12px; color: #666; background: #fff; border-top: 1px solid #f0f0f0;
 }
 .mh-hint { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mh-author { flex: none; font-size: 11px; color: #999; margin: 0 8px; white-space: nowrap; }
 .mh-links { flex: none; display: flex; align-items: center; gap: 10px; }
 .mh-links a { color: #1976d2; text-decoration: none; }
 .mh-links a:hover { text-decoration: underline; }

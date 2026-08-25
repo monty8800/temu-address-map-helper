@@ -5,6 +5,8 @@
 
 **状态：** 已在 Temu Seller Center / Agent Center 的订单与发货页面实测可用
 
+**作者：** MONTY（优必特 YOBTOP）
+
 ---
 
 ## ✨ 功能特性
