@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Temu 地址地图助手 · 浏览器扩展</title>
+<meta name="description" content="在 Temu 订单后台的收货地址旁注入「📍 地图」按钮，点击弹出中文小地图定位地址，辅助运营判断物流渠道。Chrome Manifest V3 扩展。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23008dc0'/%3E%3Cpath d='M16 25 L9 13 A7 7 0 1 1 23 13 Z' fill='%23fff'/%3E%3Ccircle cx='16' cy='13' r='3.2' fill='%23008dc0'/%3E%3C/svg%3E">
+<style>
+  :root{
+    --blue:#008dc0; --blue-d:#006f9c; --ink:#1f2b33; --muted:#5b6b76;
+    --bg:#f3f7fa; --card:#fff; --line:#e4edf2; --accent:#ffab2e;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink);background:linear-gradient(180deg,#eaf3f8,#f6fafc 40%);line-height:1.6}
+  a{color:var(--blue-d);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:900px;margin:0 auto;padding:40px 22px 60px}
+  /* hero */
+  .hero{text-align:center;padding:24px 0 8px}
+  .pill{display:inline-block;font-size:12px;font-weight:600;letter-spacing:.3px;color:#fff;background:var(--blue);padding:5px 12px;border-radius:20px;margin-bottom:18px}
+  .hero h1{font-size:40px;line-height:1.15;font-weight:800;letter-spacing:-1px}
+  .hero h1 .en{display:block;font-size:15px;font-weight:500;color:var(--muted);letter-spacing:2px;margin-top:8px}
+  .hero p.sub{font-size:16px;color:var(--muted);max-width:620px;margin:16px auto 6px}
+  .author{font-size:13px;color:var(--muted);margin-top:10px}
+  .author b{color:var(--ink)}
+  .btns{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:24px 0 8px}
+  .btn{display:inline-flex;align-items:center;gap:7px;padding:11px 20px;border-radius:10px;font-size:14px;font-weight:600;background:var(--blue);color:#fff !important;text-decoration:none;box-shadow:0 6px 18px rgba(0,141,192,.25);transition:.15s}
+  .btn:hover{background:var(--blue-d);transform:translateY(-1px)}
+  .btn.ghost{background:#fff;color:var(--blue-d) !important;border:1px solid var(--line);box-shadow:none}
+  .btn.ghost:hover{border-color:var(--blue);background:#f2fafc}
+  /* visual mockup */
+  .mock{max-width:520px;margin:26px auto 10px;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 18px 50px rgba(0,90,120,.14);overflow:hidden}
+  .mock-head{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--line);font-size:13px}
+  .mock-dot{width:10px;height:10px;border-radius:50%;background:#ff5f57}
+  .mock-dot:nth-child(2){background:#febc2e}.mock-dot:nth-child(3){background:#28c840}
+  .mock-title{margin-left:6px;font-weight:600}
+  .mock-body{position:relative;height:210px;background:linear-gradient(160deg,#f6fbf8,#e8f2ec)}
+  .mock-map-lines{position:absolute;inset:0;opacity:.5}
+  .pin{position:absolute;left:50%;top:40%;transform:translate(-50%,-100%);width:34px;height:44px}
+  .pin::before{content:"";position:absolute;left:2px;top:0;width:30px;height:30px;border-radius:50% 50% 50% 0;background:var(--blue);transform:rotate(-45deg);box-shadow:0 3px 8px rgba(0,90,120,.35)}
+  .pin::after{content:"";position:absolute;left:11px;top:9px;width:12px;height:12px;border-radius:50%;background:#fff}
+  .pop{position:absolute;left:50%;top:38%;transform:translate(-50%,-130%);background:#fff;border-radius:8px;box-shadow:0 8px 20px rgba(0,90,120,.2);padding:8px 10px;font-size:12px;white-space:nowrap}
+  .mock-foot{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}
+  /* sections */
+  h2{font-size:24px;font-weight:800;margin:56px 0 6px;letter-spacing:-.5px}
+  h2 small{display:block;font-size:13px;font-weight:500;color:var(--muted);margin-top:4px}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin-top:18px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 16px}
+  .card .ic{font-size:22px}
+  .card h3{font-size:15px;font-weight:700;margin:10px 0 4px}
+  .card p{font-size:13px;color:var(--muted)}
+  .list{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:6px 6px;margin-top:14px}
+  .list ol,.list ul{margin:0;padding:0;list-style:none}
+  .list li{display:flex;gap:12px;padding:12px 14px;border-bottom:1px solid var(--line);font-size:14px}
+  .list li:last-child{border-bottom:none}
+  .li-num{flex:none;width:24px;height:24px;border-radius:50%;background:var(--blue);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .steps .li-num{background:var(--accent);color:#5a3d00}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:#eef4f7;padding:1px 6px;border-radius:5px;font-size:13px}
+  .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:22px;margin-top:16px}
+  .tag{display:inline-block;font-size:12px;color:var(--blue-d);background:#eaf5fa;border:1px solid #cfe8f3;padding:4px 10px;border-radius:16px;margin:4px 4px 0 0}
+  .note{font-size:13px;color:var(--muted);border-left:3px solid var(--accent);background:#fffaf0;padding:10px 14px;border-radius:0 8px 8px 0;margin-top:16px}
+  footer{margin-top:64px;padding-top:22px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted);text-align:center}
+  footer a{color:var(--blue-d)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <span class="pill">Chrome 扩展 · Manifest V3 · 免费开源</span>
+    <h1>Temu 地址地图助手<span class="en">Temu Address Map Helper</span></h1>
+    <p class="sub">在 Temu 订单后台的每条订单<strong>收货地址</strong>旁注入一个「📍 地图」按钮，点击弹出<strong>中文小地图</strong>定位该地址，帮助运营人员发货时快速判断目的地与物流渠道。</p>
+    <div class="author">作者：<b>MONTY</b> · 优必特 YOBTOP</div>
+    <div class="btns">
+      <a class="btn" href="https://github.com/monty8800/temu-address-map-helper">📦 前往 GitHub</a>
+      <a class="btn ghost" href="https://github.com/monty8800/temu-address-map-helper/releases">⬇️ 下载安装包</a>
+      <a class="btn ghost" href="#install">🚀 安装指南</a>
+    </div>
+
+    <!-- 运行示意 -->
+    <div class="mock">
+      <div class="mock-head"><span class="mock-dot"></span><span class="mock-dot"></span><span class="mock-dot"></span><span class="mock-title">📍 收货地址地图</span></div>
+      <div class="mock-body">
+        <svg class="mock-map-lines" viewBox="0 0 520 210" preserveAspectRatio="none">
+          <path d="M0 70 C120 60 200 90 300 80 S470 40 520 60" stroke="#bfe0cf" stroke-width="3" fill="none"/>
+          <path d="M0 140 C130 150 260 120 400 140 S480 170 520 160" stroke="#bfe0cf" stroke-width="3" fill="none"/>
+          <path d="M40 0 C60 80 50 150 90 210" stroke="#d3e7dc" stroke-width="2" fill="none"/>
+          <path d="M450 0 C430 60 470 120 440 210" stroke="#d3e7dc" stroke-width="2" fill="none"/>
+          <circle cx="120" cy="60" r="14" fill="#cfe7f3"/><circle cx="400" cy="150" r="18" fill="#cfe7f3"/>
+        </svg>
+        <div class="pop">Milllis, Norfolk County, 马萨诸塞州 · 02054, 美国</div>
+        <div class="pin"></div>
+      </div>
+      <div class="mock-foot"><span>作者 MONTY</span><span>© 高德地图 AutoNavi</span></div>
+    </div>
+  </div>
+
+  <!-- 功能 -->
+  <h2>✨ 功能特性<small>为物流运营量身打造</small></h2>
+  <div class="cards">
+    <div class="card"><div class="ic">📍</div><h3>一键地图</h3><p>每条订单收货地址旁自动出现「📍」按钮，点击即弹出小地图。</p></div>
+    <div class="card"><div class="ic">🀄</div><h3>中文地名</h3><p>高德中文瓦片，州/城市名以中文显示（如「波士顿」「威斯康星州」）。</p></div>
+    <div class="card"><div class="ic">🎯</div><h3>自动定位</h3><p>开放地理编码（Nominatim 主 / Photon 备）解析地址，红色标记定位。</p></div>
+    <div class="card"><div class="ic">🗺️</div><h3>区域视图</h3><p>默认定位到收货地附近，可看清所在州/区域；「全国」按钮一键看全美。</p></div>
+    <div class="card"><div class="ic">🖱️</div><h3>可拖动弹窗</h3><p>拖动标题栏移动，✕ / Esc / 点遮罩关闭，+/- 或滚轮缩放。</p></div>
+    <div class="card"><div class="ic">🔒</div><h3>私密本地</h3><p>仅本地运行，不上传订单数据；无需任何 API Key，Leaflet 已本地打包。</p></div>
+  </div>
+
+  <!-- 支持页面 -->
+  <h2>🌐 支持的页面<small>匹配 *.temu.com 下所有订单 / 发货页面</small></h2>
+  <div class="grid2">
+    <div class="list"><b style="padding:4px 14px">订单 / 发货页面</b><ul>
+      <li><code>agentseller-up.temu.com/mmcs/orders.orders</code></li>
+      <li><code>agentseller-us.temu.com/mmsos/orders.html</code></li>
+      <li><code>agentseller-us.temu.com/mmsos/online-shipment.html</code></li>
+      <li><span>以及 <code>*.temu.com</code> 上展示收货地址的页面</span></li>
+    </ul></div>
+    <div class="list"><b style="padding:4px 14px">自动识别地址格式</b><ul>
+      <li>美国：城市, 州 邮编, United States</li>
+      <li>英国 / 加拿大：英式 / 加式邮编</li>
+      <li>欧洲：5 位邮编（德法意西等）</li>
+      <li>含街道的完整地址</li>
+    </ul></div>
+  </div>
+
+  <!-- 安装 -->
+  <h2 id="install">🚀 安装方法<small>Chrome / Edge 通用</small></h2>
+  <div class="list steps">
+    <ol>
+      <li><span class="li-num">1</span><span>打开浏览器地址栏，进入 <code>chrome://extensions</code>（Edge 为 <code>edge://extensions</code>）。</span></li>
+      <li><span class="li-num">2</span><span>打开右上角<strong>开发者模式</strong>。</span></li>
+      <li><span class="li-num">3</span><span>点击<strong>加载已解压的扩展程序</strong>，选择包含 <code>manifest.json</code> 的项目文件夹。</span></li>
+      <li><span class="li-num">4</span><span>刷新 Temu 订单后台，每条订单收货地址旁即出现「📍 地图」按钮。</span></li>
+    </ol>
+  </div>
+  <div class="note">💡 也可以直接从 <a href="https://github.com/monty8800/temu-address-map-helper/releases">Releases 页</a> 下载 zip，解压后按上述第 3 步“加载已解压的扩展程序”选择解压文件夹。</div>
+
+  <!-- 技术栈 -->
+  <h2>🛠️ 技术栈</h2>
+  <div class="grid2">
+    <div>
+      <p style="font-size:14px;color:var(--muted);margin-top:8px">纯前端扩展，无需后端。</p>
+      <div>
+        <span class="tag">Chrome Manifest V3</span><span class="tag">Leaflet 1.9.4</span><span class="tag">高德地图中文瓦片</span><span class="tag">OpenStreetMap 定位</span><span class="tag">Photon 兜底</span><span class="tag">零 API Key</span>
+      </div>
+      <p style="font-size:13px;color:var(--muted);margin-top:14px">底图坐标使用高德（GCJ-02），全国 / 区域视图下与 OpenStreetMap（WGS-84）坐标差异可忽略；街道级可能略有偏移。</p>
+    </div>
+    <div class="list"><b style="padding:4px 14px">数据与隐私</b><ul>
+      <li><span>扩展<strong>仅在本地</strong>运行，不向任何服务器上传订单数据。</span></li>
+      <li><span>仅在地图定位时，把<strong>该单收货地址</strong>发给开放地图服务解析坐标。</span></li>
+      <li><span>不含任何统计、广告或第三方 SDK。</span></li>
+    </ul></div>
+  </div>
+
+  <footer>
+    <p>作者 <b>MONTY</b> · 优必特 YOBTOP &nbsp;|&nbsp; <a href="https://github.com/monty8800/temu-address-map-helper">GitHub 仓库</a> &nbsp;|&nbsp; <a href="https://github.com/monty8800/temu-address-map-helper/releases">Releases</a></p>
+    <p style="margin-top:8px">本项目为运营辅助工具，与 Temu、高德地图、OpenStreetMap、Komoot 无任何隶属或合作关系。请遵守相关平台使用条款与当地法规。</p>
+    <p style="margin-top:10px">MIT License · Copyright (c) 2026 MONTY（优必特 YOBTOP）</p>
+  </footer>
+</div>
+</body>
+</html>
